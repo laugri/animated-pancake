@@ -59,6 +59,8 @@ typings/
 
 # Production
 /build
+# Scss byproducts
+src/**/*.css
 
 # Misc
 .DS_Store
