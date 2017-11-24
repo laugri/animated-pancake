@@ -1,7 +1,8 @@
 // @flow
 
 import React, { Component } from 'react';
-import './App.css';
+import './app.css';
+import Form from './features/form/form.js';
 
 type Props = void;
 
@@ -14,13 +15,7 @@ class App extends Component<Props> {
             <h1>Hi there</h1>
             <p>Chose an image you want our bot to describe.</p>
           </div>
-          <form className="App__Card__Content">
-            <div className="Input">
-              <label>Your file</label>
-              <input type="file" />
-            </div>
-            <button className="Button">Describe</button>
-          </form>
+          <Form />
         </div>
       </div>
     );
