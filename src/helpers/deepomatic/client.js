@@ -25,7 +25,7 @@ function delay(time) {
 
 function handleAPIError(error: {
   response: { body: { error: string } },
-}): string {
+}): Promise<string> {
   const errorMessage = error.response.body.error;
   console.warn(`Something went wrong when calling the API: ${errorMessage}`);
   return Promise.reject(errorMessage);
