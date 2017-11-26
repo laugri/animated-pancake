@@ -12,7 +12,7 @@ export type Task = {
   error: string,
   date_created: string,
   date_updated: string,
-  data: Object,
+  data: { boxes: Object, height: number, width: number },
 };
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH';

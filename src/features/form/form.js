@@ -48,6 +48,26 @@ class Form extends Component<Props, State> {
     });
   };
 
+  renderResults() {
+    const { task } = this.state;
+    if (!task) {
+      return;
+    } else {
+      return (
+        <div className="Results">
+          <h2 className="Results__Title">
+            We found the following items on your image:
+          </h2>
+          {Object.keys(task.data.boxes).map(key => (
+            <p className="Results__Item" key={key}>
+              {key}
+            </p>
+          ))}
+        </div>
+      );
+    }
+  }
+
   render() {
     const { error } = this.state;
     return (
@@ -58,6 +78,7 @@ class Form extends Component<Props, State> {
           <p className="Input__ErrorMessage">{error}</p>
         </div>
         <button className="Button">Describe</button>
+        {this.renderResults()}
       </form>
     );
   }
