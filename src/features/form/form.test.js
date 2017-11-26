@@ -66,4 +66,44 @@ describe('<Form/>', () => {
     expect(wrapper.find('.CallStatus').exists()).toBe(false);
     expect(wrapper.find(Results).exists()).toBe(true);
   });
+
+  describe('.handleSubmit()', () => {
+    test('should display error with no file in state', () => {
+      const instance = shallow(<Form />).instance();
+      instance.setState({ task: mockTask });
+      const event = { preventDefault: jest.fn() };
+      instance.handleSubmit({}, event);
+      expect(event.preventDefault).toBeCalled();
+      expect(instance.state).toEqual({
+        file: '',
+        error: 'No file was selected for upload',
+        task: undefined,
+        uploading: false,
+        polling: false,
+      });
+    });
+
+    test('should call the client when a file is provided', () => {
+      const instance = shallow(<Form />).instance();
+      instance.setState({ file: 'file' });
+
+      const event = { preventDefault: jest.fn() };
+      const client = {
+        submitFile: jest.fn(() => Promise.resolve('taskId')),
+        retrieveTaskResults: jest.fn(() => Promise.resolve(mockTask)),
+      };
+
+      instance.handleSubmit(client, event).then(() => {
+        expect(client.submitFile).toHaveBeenCalledWith('file');
+        expect(client.retrieveTaskResults).toHaveBeenCalledWith('taskId');
+        expect(instance.state).toEqual({
+          file: 'file',
+          error: '',
+          task: mockTask,
+          uploading: false,
+          polling: false,
+        });
+      });
+    });
+  });
 });

@@ -37,10 +37,10 @@ class Form extends Component<Props, State> {
       this.setState({ error: 'No file was selected for upload' });
     } else {
       this.setState({ uploading: true });
-      Deepomatic.submitFile(file).then(
+      return client.submitFile(file).then(
         taskId => {
           this.setState({ polling: true });
-          Deepomatic.retrieveTaskResults(taskId).then((task: Task) => {
+          return client.retrieveTaskResults(taskId).then((task: Task) => {
             this.setState({ polling: false, uploading: false });
             this.setState({ task });
           });
