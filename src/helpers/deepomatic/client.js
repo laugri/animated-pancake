@@ -17,6 +17,12 @@ export type Task = {
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH';
 
+function delay(time) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, time);
+  });
+}
+
 function handleAPIError(error: {
   response: { body: { error: string } },
 }): string {
@@ -68,9 +74,11 @@ function retrieveTaskResults(taskId: string): Promise<Task> {
 function pollTaskUntilSuccess(taskId: string, task: Task): Promise<Task> {
   const hasSucceeded = task.status === 'success';
   if (!hasSucceeded) {
-    return getTask(taskId).then(task => {
-      return pollTaskUntilSuccess(taskId, task);
-    });
+    return delay(1000).then(() =>
+      getTask(taskId).then(task => {
+        return pollTaskUntilSuccess(taskId, task);
+      })
+    );
   } else {
     return Promise.resolve(task);
   }
