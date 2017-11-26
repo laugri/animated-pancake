@@ -1,7 +1,8 @@
 // @flow
 
 import React, { Component } from 'react';
-import { submitFile } from 'helpers/deepomatic.js';
+import Deepomatic from 'helpers/deepomatic/client.js';
+import type { Task } from 'helpers/deepomatic/client.js';
 import { encodeFileToBase64 } from 'utils/file.js';
 import './form.css';
 
@@ -9,6 +10,7 @@ type Props = {};
 type State = {
   file: string,
   error: string,
+  task: ?Task,
 };
 
 class Form extends Component<Props, State> {
@@ -18,22 +20,21 @@ class Form extends Component<Props, State> {
     this.state = {
       file: '',
       error: '',
+      task: undefined,
     };
   }
 
   handleSubmit = (event: SyntheticEvent<>) => {
     event.preventDefault();
     const { file } = this.state;
-    submitFile(file).then(
-      response => {
-        console.log('response', response, response.body);
+    Deepomatic.submitFile(file).then(
+      taskId => {
+        Deepomatic.retrieveTaskResults(taskId).then((task: Task) => {
+          this.setState({ task });
+        });
       },
       error => {
-        const errorMessage = error.response.body.error;
-        console.warn(
-          `Something went wrong when calling the API: ${errorMessage}`
-        );
-        this.setState({ error: errorMessage });
+        this.setState({ error });
       }
     );
   };
