@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import Deepomatic from 'helpers/deepomatic/client.js';
 import type { Task } from 'helpers/deepomatic/client.js';
 import { encodeFileToBase64 } from 'utils/file.js';
+import { replaceAll } from 'utils/string.js';
 import './form.css';
 
 type Props = {};
@@ -78,11 +79,13 @@ class Form extends Component<Props, State> {
           <h2 className="Results__Title">
             We found the following items on your image:
           </h2>
-          {Object.keys(task.data.boxes).map(key => (
-            <p className="Results__Item" key={key}>
-              {key}
-            </p>
-          ))}
+          <ul>
+            {Object.keys(task.data.boxes).map(key => (
+              <li className="Results__Item" key={key}>
+                {replaceAll(key, '-', ' ')}
+              </li>
+            ))}
+          </ul>
         </div>
       );
     }

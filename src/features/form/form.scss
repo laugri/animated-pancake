@@ -13,6 +13,13 @@
   }
 }
 
+.Results {
+  &__Item {
+    margin: 8px 0;
+    text-transform: capitalize;
+  }
+}
+
 .Input {
   &__Label {
     font-size: 14px;
