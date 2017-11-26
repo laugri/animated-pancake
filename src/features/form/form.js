@@ -41,8 +41,7 @@ class Form extends Component<Props, State> {
         taskId => {
           this.setState({ polling: true });
           return client.retrieveTaskResults(taskId).then((task: Task) => {
-            this.setState({ polling: false, uploading: false });
-            this.setState({ task });
+            this.setState({ polling: false, uploading: false, task });
           });
         },
         error => {
@@ -57,6 +56,7 @@ class Form extends Component<Props, State> {
     encodeFileToBase64(file).then((encodedFile: string) => {
       this.setState({
         file: encodedFile,
+        error: '',
       });
     });
   };
