@@ -11,6 +11,8 @@ type State = {
   file: string,
   error: string,
   task: ?Task,
+  uploading: boolean,
+  polling: boolean,
 };
 
 class Form extends Component<Props, State> {
@@ -21,15 +23,20 @@ class Form extends Component<Props, State> {
       file: '',
       error: '',
       task: undefined,
+      uploading: false,
+      polling: false,
     };
   }
 
   handleSubmit = (event: SyntheticEvent<>) => {
     event.preventDefault();
     const { file } = this.state;
+    this.setState({ uploading: true });
     Deepomatic.submitFile(file).then(
       taskId => {
+        this.setState({ polling: true });
         Deepomatic.retrieveTaskResults(taskId).then((task: Task) => {
+          this.setState({ polling: false, uploading: false });
           this.setState({ task });
         });
       },
@@ -41,12 +48,25 @@ class Form extends Component<Props, State> {
 
   handleChange = (event: SyntheticInputEvent<>) => {
     const file = event.target.files[0];
+    this.setState({ task: undefined });
     encodeFileToBase64(file).then((encodedFile: string) => {
       this.setState({
         file: encodedFile,
       });
     });
   };
+
+  renderCallStatus() {
+    const { polling, uploading } = this.state;
+    return (
+      (polling || uploading) && (
+        <div className="CallStatus">
+          {uploading && <p>Uploading file...</p>}
+          {polling && <p>Waiting for results...</p>}
+        </div>
+      )
+    );
+  }
 
   renderResults() {
     const { task } = this.state;
@@ -78,6 +98,7 @@ class Form extends Component<Props, State> {
           <p className="Input__ErrorMessage">{error}</p>
         </div>
         <button className="Button">Describe</button>
+        {this.renderCallStatus()}
         {this.renderResults()}
       </form>
     );
