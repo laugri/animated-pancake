@@ -1,6 +1,6 @@
 // @flow
 
-import request from 'superagent';
+import superagent from 'superagent';
 
 export const APP_ID = 283723326633;
 export const API_KEY = 'b01a86463f6e4d58978da77b912d7fa5';
@@ -15,45 +15,48 @@ export type Task = {
   data: Object,
 };
 
-function submitFile(encodedFile: string): Promise<string> {
-  return request
-    .post(`${BASE_URL}/detect/fashion`)
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH';
+
+function handleAPIError(error: {
+  response: { body: { error: string } },
+}): string {
+  const errorMessage = error.response.body.error;
+  console.warn(`Something went wrong when calling the API: ${errorMessage}`);
+  return errorMessage;
+}
+
+function buildUrl(path: string): string {
+  return `${BASE_URL}${path}`;
+}
+
+function buildRequest(
+  client,
+  method: HttpMethod,
+  path: string,
+  payload: ?Object
+) {
+  const request = client(method, buildUrl(path))
     .set('X-APP-ID', APP_ID)
     .set('X-API-KEY', API_KEY)
-    .set('Accept', 'application/json')
-    .send({ base64: encodedFile })
-    .then(
-      (response: { body: { task_id: string } }) => {
-        return response.body.task_id;
-      },
-      (error: { response: { body: { error: string } } }) => {
-        const errorMessage = error.response.body.error;
-        console.warn(
-          `Something went wrong when calling the API: ${errorMessage}`
-        );
-        return errorMessage;
-      }
-    );
+    .set('Accept', 'application/json');
+  return payload ? request.send(payload) : request;
+}
+
+function submitFile(encodedFile: string): Promise<string> {
+  return buildRequest(superagent, 'POST', '/detect/fashion', {
+    base64: encodedFile,
+  }).then((response: { body: { task_id: string } }) => {
+    return response.body.task_id;
+  }, handleAPIError);
 }
 
 function getTask(taskId: string): Promise<Task> {
-  return request
-    .get(`${BASE_URL}/tasks/${taskId}`)
-    .set('X-APP-ID', APP_ID)
-    .set('X-API-KEY', API_KEY)
-    .set('Accept', 'application/json')
-    .then(
-      (response: { body: { task: Task } }) => {
-        return response.body.task;
-      },
-      (error: { response: { body: { error: string } } }) => {
-        const errorMessage = error.response.body.error;
-        console.warn(
-          `Something went wrong when calling the API: ${errorMessage}`
-        );
-        return errorMessage;
-      }
-    );
+  return buildRequest(superagent, 'GET', `/tasks/${taskId}`).then(
+    (response: { body: { task: Task } }) => {
+      return response.body.task;
+    },
+    handleAPIError
+  );
 }
 
 function retrieveTaskResults(taskId: string): Promise<Task> {
