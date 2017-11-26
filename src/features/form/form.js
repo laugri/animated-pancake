@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import Deepomatic from 'helpers/deepomatic/client.js';
 import type { Task } from 'helpers/deepomatic/client.js';
 import { encodeFileToBase64 } from 'utils/file.js';
-import { replaceAll } from 'utils/string.js';
+import Results from 'features/results/results.js';
 import './form.css';
 
 type Props = {};
@@ -29,27 +29,31 @@ class Form extends Component<Props, State> {
     };
   }
 
-  handleSubmit = (event: SyntheticEvent<>) => {
+  handleSubmit = (client: Object, event: SyntheticEvent<>) => {
     event.preventDefault();
     const { file } = this.state;
-    this.setState({ uploading: true });
-    Deepomatic.submitFile(file).then(
-      taskId => {
-        this.setState({ polling: true });
-        Deepomatic.retrieveTaskResults(taskId).then((task: Task) => {
-          this.setState({ polling: false, uploading: false });
-          this.setState({ task });
-        });
-      },
-      error => {
-        this.setState({ error });
-      }
-    );
+    this.setState({ task: undefined });
+    if (!file) {
+      this.setState({ error: 'No file was selected for upload' });
+    } else {
+      this.setState({ uploading: true });
+      Deepomatic.submitFile(file).then(
+        taskId => {
+          this.setState({ polling: true });
+          Deepomatic.retrieveTaskResults(taskId).then((task: Task) => {
+            this.setState({ polling: false, uploading: false });
+            this.setState({ task });
+          });
+        },
+        error => {
+          this.setState({ error, uploading: false, polling: false });
+        }
+      );
+    }
   };
 
   handleChange = (event: SyntheticInputEvent<>) => {
     const file = event.target.files[0];
-    this.setState({ task: undefined });
     encodeFileToBase64(file).then((encodedFile: string) => {
       this.setState({
         file: encodedFile,
@@ -62,39 +66,21 @@ class Form extends Component<Props, State> {
     return (
       (polling || uploading) && (
         <div className="CallStatus">
-          {uploading && <p>Uploading file...</p>}
-          {polling && <p>Waiting for results...</p>}
+          {uploading && (
+            <p className="CallStatus__Uploading">Uploading file...</p>
+          )}
+          {polling && (
+            <p className="CallStatus__Waiting">Waiting for results...</p>
+          )}
         </div>
       )
     );
   }
 
-  renderResults() {
-    const { task } = this.state;
-    if (!task) {
-      return;
-    } else {
-      return (
-        <div className="Results">
-          <h2 className="Results__Title">
-            We found the following items on your image:
-          </h2>
-          <ul>
-            {Object.keys(task.data.boxes).map(key => (
-              <li className="Results__Item" key={key}>
-                {replaceAll(key, '-', ' ')}
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-    }
-  }
-
   render() {
-    const { error } = this.state;
+    const { error, task } = this.state;
     return (
-      <form className="Form" onSubmit={this.handleSubmit}>
+      <form className="Form" onSubmit={e => this.handleSubmit(Deepomatic, e)}>
         <div className="Input">
           <label className="Input__Label">Your file</label>
           <input type="file" onChange={this.handleChange} />
@@ -102,7 +88,7 @@ class Form extends Component<Props, State> {
         </div>
         <button className="Button">Describe</button>
         {this.renderCallStatus()}
-        {this.renderResults()}
+        {task && <Results boxes={task.data.boxes} />}
       </form>
     );
   }

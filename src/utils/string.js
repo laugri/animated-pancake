@@ -1,5 +1,5 @@
 export function escapeRegExp(string: string): string {
-  return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+  return string.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
 }
 
 export function replaceAll(

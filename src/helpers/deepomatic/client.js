@@ -28,7 +28,7 @@ function handleAPIError(error: {
 }): string {
   const errorMessage = error.response.body.error;
   console.warn(`Something went wrong when calling the API: ${errorMessage}`);
-  return errorMessage;
+  return Promise.reject(errorMessage);
 }
 
 function buildUrl(path: string): string {
