@@ -30,6 +30,8 @@
     padding: 10px 16px;
     border-radius: 4px;
     border: solid 1px $font-color;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 

@@ -6,12 +6,13 @@ import './results.css';
 
 type Props = {
   boxes: Object,
+  file: ?string,
 };
 type State = void;
 
 class Results extends Component<Props, State> {
   render() {
-    const { boxes } = this.props;
+    const { boxes, file } = this.props;
     const items = Object.keys(boxes);
     if (items.length === 0) {
       return (
@@ -32,6 +33,7 @@ class Results extends Component<Props, State> {
               </li>
             ))}
           </ul>
+          {file && <img src={file} alt="preview" className="Image" />}
         </div>
       );
     }

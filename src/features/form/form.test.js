@@ -85,7 +85,7 @@ describe('<Form/>', () => {
 
     test('should call the client when a file is provided', () => {
       const instance = shallow(<Form />).instance();
-      instance.setState({ file: 'file' });
+      instance.setState({ file: 'data:image/png;base64,file' });
 
       const event = { preventDefault: jest.fn() };
       const client = {
@@ -97,7 +97,7 @@ describe('<Form/>', () => {
         expect(client.submitFile).toHaveBeenCalledWith('file');
         expect(client.retrieveTaskResults).toHaveBeenCalledWith('taskId');
         expect(instance.state).toEqual({
-          file: 'file',
+          file: 'data:image/png;base64,file',
           error: '',
           task: mockTask,
           uploading: false,

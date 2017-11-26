@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import Deepomatic from 'helpers/deepomatic/client.js';
 import type { Task } from 'helpers/deepomatic/client.js';
-import { encodeFileToBase64 } from 'utils/file.js';
+import { encodeFileToBase64, stripBase64Type } from 'utils/file.js';
 import Results from 'features/results/results.js';
 import './form.css';
 
@@ -37,7 +37,7 @@ class Form extends Component<Props, State> {
       this.setState({ error: 'No file was selected for upload' });
     } else {
       this.setState({ uploading: true });
-      return client.submitFile(file).then(
+      return client.submitFile(stripBase64Type(file)).then(
         taskId => {
           this.setState({ polling: true });
           return client.retrieveTaskResults(taskId).then((task: Task) => {
@@ -78,7 +78,7 @@ class Form extends Component<Props, State> {
   }
 
   render() {
-    const { error, task } = this.state;
+    const { error, task, file } = this.state;
     return (
       <form className="Form" onSubmit={e => this.handleSubmit(Deepomatic, e)}>
         <div className="Input">
@@ -88,7 +88,7 @@ class Form extends Component<Props, State> {
         </div>
         <button className="Button">Describe</button>
         {this.renderCallStatus()}
-        {task && <Results boxes={task.data.boxes} />}
+        {task && <Results boxes={task.data.boxes} file={file} />}
       </form>
     );
   }
