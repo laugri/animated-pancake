@@ -17,8 +17,9 @@ type Box = {
   ymin: number,
 };
 type ExtendedBox = Box & { type: string };
+type Boxes = { [string]: Array<Box> };
 
-export function flattenBoxes(boxes: Object<string, Box>): Array<ExtendedBox> {
+export function flattenBoxes(boxes: Boxes): Array<ExtendedBox> {
   const flattened = [];
   for (const itemType of Object.keys(boxes)) {
     const items = boxes[itemType];
