@@ -29,6 +29,10 @@ class Form extends Component<Props, State> {
     };
   }
 
+  handleError = (error: string) => {
+    this.setState({ error, uploading: false, polling: false });
+  };
+
   handleSubmit = (client: Object, event: SyntheticEvent<>) => {
     event.preventDefault();
     const { file } = this.state;
@@ -37,17 +41,12 @@ class Form extends Component<Props, State> {
       this.setState({ error: 'No file was selected for upload' });
     } else {
       this.setState({ uploading: true });
-      return client.submitFile(stripBase64Type(file)).then(
-        taskId => {
-          this.setState({ polling: true });
-          return client.retrieveTaskResults(taskId).then((task: Task) => {
-            this.setState({ polling: false, uploading: false, task });
-          });
-        },
-        error => {
-          this.setState({ error, uploading: false, polling: false });
-        }
-      );
+      return client.submitFile(stripBase64Type(file)).then(taskId => {
+        this.setState({ polling: true });
+        return client.retrieveTaskResults(taskId).then((task: Task) => {
+          this.setState({ polling: false, uploading: false, task });
+        }, this.handleError);
+      }, this.handleError);
     }
   };
 

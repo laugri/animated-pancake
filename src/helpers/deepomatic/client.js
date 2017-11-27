@@ -72,15 +72,16 @@ function retrieveTaskResults(taskId: string): Promise<Task> {
 }
 
 function pollTaskUntilSuccess(taskId: string, task: Task): Promise<Task> {
-  const hasSucceeded = task.status === 'success';
-  if (!hasSucceeded) {
+  if (task.status === 'success') {
+    return Promise.resolve(task);
+  } else if (task.status === 'error') {
+    return Promise.reject(task.error);
+  } else {
     return delay(1000).then(() =>
       getTask(taskId).then(task => {
         return pollTaskUntilSuccess(taskId, task);
       })
     );
-  } else {
-    return Promise.resolve(task);
   }
 }
 
