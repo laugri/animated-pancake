@@ -106,4 +106,19 @@ describe('<Form/>', () => {
       });
     });
   });
+
+  describe('.handleError()', () => {
+    test('should set state properly', () => {
+      const instance = shallow(<Form />).instance();
+      instance.setState({ uploading: true, polling: true });
+      instance.handleError('error');
+      expect(instance.state).toEqual({
+        file: '',
+        error: 'error',
+        task: undefined,
+        uploading: false,
+        polling: false,
+      });
+    });
+  });
 });
