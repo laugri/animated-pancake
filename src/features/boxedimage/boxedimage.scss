@@ -1,4 +1,5 @@
 @import 'style/_colors.scss';
+@import 'style/_fonts.scss';
 
 .BoxedImage {
   position: relative;
@@ -19,5 +20,8 @@
     display: inline-block;
     text-align: center;
     text-transform: capitalize;
+    padding: 4px;
+    box-sizing: border-box;
+    font-size: $fs-label;
   }
 }
