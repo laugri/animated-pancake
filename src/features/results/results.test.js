@@ -8,11 +8,11 @@ import BoxedImage from 'features/boxedimage/boxedimage.js';
 describe('<Results/>', () => {
   describe('display', () => {
     test('renders without crashing', () => {
-      shallow(<Results boxes={{}} />);
+      shallow(<Results boxes={{}} file="" />);
     });
 
     test('should display no-results disclaimer', () => {
-      const wrapper = shallow(<Results boxes={{}} />);
+      const wrapper = shallow(<Results boxes={{}} file="" />);
       expect(wrapper.find('.Results__ItemList').exists()).toBe(false);
       expect(wrapper.find('.Results__Title').text()).toEqual(
         'We found no item in you image.'
